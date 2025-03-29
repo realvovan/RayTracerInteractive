@@ -27,10 +27,11 @@ class Camera {
     Vector3 defocusDiskU;
     Vector3 defocusDiskV;
 
-    public void Render(string path,Hittable world) {
+#nullable enable
+    public Image? Render(Hittable world) {
 		if (IsRendering) {
             MessageBox.Show("Rendering already in progress");
-            return;
+            return null;
 		}
         this.IsRendering = true;
 		this.init();
@@ -40,7 +41,7 @@ class Camera {
             for(int i = 0; i < this.imageWidth; i++) {
                 if (!IsRendering) {
                     bitmap.Dispose();
-                    return;
+                    return null;
                 }
                 Color pixelColor = new(0,0,0);
                 for(int sample = 0; sample < this.SamplesPerPixel; sample++) {
@@ -50,8 +51,9 @@ class Camera {
 				bitmap.SetPixel(i,this.ScanLines,Color.ToSystemColor(this.pixelSampleScale * pixelColor));
             }
         }
-        bitmap.Save(path,System.Drawing.Imaging.ImageFormat.Jpeg);
-        bitmap.Dispose();
+        //bitmap.Save(path,System.Drawing.Imaging.ImageFormat.Jpeg);
+        //bitmap.Dispose();
+        return (Image)bitmap;
     }
 
     void init() {

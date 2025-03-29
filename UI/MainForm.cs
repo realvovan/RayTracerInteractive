@@ -139,10 +139,20 @@ public partial class MainForm : Form {
 		this.Enabled = false;
 		var progressForm = new RenderProgress();
 		progressForm.Show();
-		_ = Task.Run(() => {
+		var renderTask = Task.Run(() => {
 			HittableList hittables = new();
+			string directory = this.OutputPathSelection.SelectedPath;
+			string fullPath = directory + "\\output.jpeg";
 			foreach (KeyValuePair<string,Sphere> i in this.scene) hittables.Add(i.Value);
-			this.cam.Render(this.OutputPathSelection.SelectedPath + "\\output.jpeg",hittables);
+			//this.cam.Render(this.OutputPathSelection.SelectedPath + "\\output.jpeg",hittables);
+			using Image? render = this.cam.Render(hittables);
+			if (render == null) return;
+			int counter = 1;
+			while (File.Exists(fullPath)) {
+				fullPath = directory + string.Format("\\output({0}).jpeg",counter);
+				counter++;
+			}
+			render.Save(fullPath,System.Drawing.Imaging.ImageFormat.Jpeg);
 		});
 		//add an event for when you want to abort the render
 		progressForm.StopRender.Click += (sender,args) => {
@@ -161,6 +171,7 @@ public partial class MainForm : Form {
 		//closes the application
 		progressForm.Close();
 		Process.Start("explorer.exe",this.OutputPathSelection.SelectedPath);
+		await renderTask; //wait for the file to get saved
 		this.Close();
 		Application.Exit();
 	}
@@ -172,7 +183,11 @@ public partial class MainForm : Form {
 			onResize(this,new EventArgs());
 		}
 	}
-	private void OpenSceneEditor_Click(object sender,EventArgs e) => new SceneEditor().ShowDialog();
+	private void OpenSceneEditor_Click(object sender,EventArgs e) {
+		using (SceneEditor sceneEditor = new()) {
+			sceneEditor.ShowDialog();
+		}
+	}
 
 	private void onResize(object sender,EventArgs e) {
 		foreach (KeyValuePair<Control,double?[]> kv in this.scaleSizes) {
