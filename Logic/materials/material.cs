@@ -2,6 +2,7 @@ namespace RayTracer;
 
 abstract class Material {
     public abstract bool Scatter(Ray rIn,HitRecord rec,ref Color attenuation,ref Ray scattered);
+    public abstract Material Clone();
 }
 
 class Lambertian(Color albedo) : Material {
@@ -14,6 +15,7 @@ class Lambertian(Color albedo) : Material {
         attenuation = this.Albedo;
         return true;
     }
+    public override Lambertian Clone() => new Lambertian(this.Albedo.Clone());
 }
 
 class Metal(Color albedo,double fuzz) : Material {
@@ -27,6 +29,7 @@ class Metal(Color albedo,double fuzz) : Material {
         attenuation = this.Albedo;
         return Vector3.Dot(scattered.Direction,rec.Normal) > 0;
     }
+    public override Metal Clone() => new Metal(this.Albedo.Clone(),this.Fuzz);
 }
 
 class Dielectric(double refractionIndex) : Material {
@@ -44,8 +47,9 @@ class Dielectric(double refractionIndex) : Material {
         scattered = new Ray(rec.P,direction);
         return true;
     }
+	public override Dielectric Clone() => new Dielectric(this.RefractionIndex);
 
-    static double reflectance(double cosine,double refractionIndex) {
+	static double reflectance(double cosine,double refractionIndex) {
         var r0 = (1 - refractionIndex) / (1 + refractionIndex);
         r0 = r0*r0;
         return r0 + (1-r0)*Math.Pow(1-cosine,5);

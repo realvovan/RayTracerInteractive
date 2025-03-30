@@ -6,11 +6,11 @@ using RayTracer;
 namespace RayTracerUI;
 
 public partial class MainForm : Form {
-	private Camera cam = new();
 	private Dictionary<Control,double?[]> scalePositions;
 	private Dictionary<Control,double?[]> scaleSizes;
 	private Dictionary<Control,double[]> anchorPoints;
 	private System.Drawing.Color outputDestDefaultColor;
+	internal readonly Camera cam = new();
 	internal Dictionary<string,Sphere> scene = [];
 
 	public MainForm() {

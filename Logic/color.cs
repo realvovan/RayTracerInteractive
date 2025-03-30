@@ -10,6 +10,8 @@ class Color {
     public Color() => this.colors = [0,0,0];
     public Color(double r, double g, double b) => this.colors = [r,g,b];
 
+    public Color Clone() => new Color(this.R,this.G,this.B);
+
     public static System.Drawing.Color ToSystemColor(Color color) {
 		var r = LinearToGamma(color.colors[0]);
 		var g = LinearToGamma(color.colors[1]);

@@ -48,6 +48,8 @@
 			this.RadiusBox = new TextBox();
 			this.ObjectPosition = new Label();
 			this.PositionBox = new TextBox();
+			this.ImagePreview = new Label();
+			this.RenderPreview = new Button();
 			this.ObjectControls.SuspendLayout();
 			this.LambertianProperties.SuspendLayout();
 			this.MetalProperties.SuspendLayout();
@@ -299,11 +301,32 @@
 			this.PositionBox.Tag = "Vector";
 			this.PositionBox.TextAlign = HorizontalAlignment.Center;
 			// 
+			// ImagePreview
+			// 
+			this.ImagePreview.BackColor = Color.Silver;
+			this.ImagePreview.Location = new Point(652,88);
+			this.ImagePreview.Name = "ImagePreview";
+			this.ImagePreview.Size = new Size(231,140);
+			this.ImagePreview.TabIndex = 11;
+			// 
+			// RenderPreview
+			// 
+			this.RenderPreview.Font = new Font("Segoe UI",9F,FontStyle.Bold);
+			this.RenderPreview.Location = new Point(727,242);
+			this.RenderPreview.Name = "RenderPreview";
+			this.RenderPreview.Size = new Size(97,43);
+			this.RenderPreview.TabIndex = 12;
+			this.RenderPreview.Text = "Render preview";
+			this.RenderPreview.UseVisualStyleBackColor = true;
+			this.RenderPreview.Click += this.RenderPreview_Click;
+			// 
 			// SceneEditor
 			// 
 			this.AutoScaleDimensions = new SizeF(7F,15F);
 			this.AutoScaleMode = AutoScaleMode.Font;
-			this.ClientSize = new Size(624,459);
+			this.ClientSize = new Size(916,459);
+			this.Controls.Add(this.RenderPreview);
+			this.Controls.Add(this.ImagePreview);
 			this.Controls.Add(this.PositionBox);
 			this.Controls.Add(this.ObjectPosition);
 			this.Controls.Add(this.RadiusBox);
@@ -361,5 +384,7 @@
 		private TextBox RadiusBox;
 		private Label ObjectPosition;
 		private TextBox PositionBox;
+		private Label ImagePreview;
+		private Button RenderPreview;
 	}
 }

@@ -29,6 +29,8 @@ public partial class SceneEditor : Form {
 			label.Click += onSceneObjectClick;
 			this.SceneObjects.Controls.Add(label);
 		}
+		Utils.ScaleControlPosition(this.RenderPreview,[0.8235,null],[0.5,0]);
+		Utils.ScaleControlPosition(this.ImagePreview,[0.8235,null],[0.5,0]);
 	}
 	private void onKeyPressTagDouble(object? sender,KeyPressEventArgs args) {
 		if (args.KeyChar == (char)Keys.Enter) {
@@ -259,6 +261,34 @@ public partial class SceneEditor : Form {
 		this.ObjectNameBox.Text = "";
 		this.RadiusBox.Text = "";
 		this.PositionBox.Text = "";
+	}
+
+	private async void RenderPreview_Click(object sender,EventArgs e) {
+		this.RenderPreview.Enabled = false;
+		this.UseWaitCursor = true;
+		Camera renderCam = Program.mainForm.cam;
+		Camera previewCam = new();
+		HittableList previewScene = new();
+		foreach (var property in typeof(Camera).GetFields()) {
+			property.SetValue(previewCam,property.GetValue(renderCam));
+		}
+		previewCam.ImageHeight = 240;
+		foreach (KeyValuePair<string,Sphere> i in Program.mainForm.scene) {
+			previewScene.Add(new Sphere(
+				new Vector3(i.Value.Center.X,i.Value.Center.Y,i.Value.Center.Z),
+				i.Value.Radius,
+				i.Value.Material.Clone()
+			));
+		}
+		Image? preview = await Task.Run(() => previewCam.Render(previewScene));
+		if (preview != null) {
+			this.ImagePreview.Image = preview;
+			this.ImagePreview.Width = (int)(this.ImagePreview.Height * previewCam.AspectRatio);
+			Utils.ScaleControlPosition(this.ImagePreview,[0.8235,null],[0.5,0]);
+		};
+		previewScene.Clear();
+		this.RenderPreview.Enabled = true;
+		this.UseWaitCursor = false;
 	}
 
 	private static string getObjectLabelText(string name,Sphere obj)
