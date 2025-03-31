@@ -96,7 +96,7 @@ public partial class SceneEditor : Form {
 		} else {
 			//material property
 			var propertyName = (control.Tag as string[])![1];
-			sphere.Material.GetType().GetProperty(propertyName)!.SetValue(sphere.Material,Convert.ToDouble(control.Text));
+			sphere.Material.GetType().GetProperty(propertyName)?.SetValue(sphere.Material,Convert.ToDouble(control.Text));
 		}
 		this.selectedObject.Text = getObjectLabelText(this.selectedObject.Name,sphere);
 	}
