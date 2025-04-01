@@ -3,17 +3,16 @@ namespace RayTracer;
 class Camera {
     public int ScanLines { get; private set; } = -1;
 	public bool IsRendering { get; set; } = false;
-
-	public double AspectRatio = 1.0;
-    public int ImageHeight = 100;
-    public int SamplesPerPixel = 10;
-    public int MaxDepth = 10;
-    public double vFOV = 90;
-    public double DefocusAngle = 0;
-    public double FocusDistance = 10;
-    public Vector3 LookFrom = new Vector3(0,0,3);
-    public Vector3 LookAt = new Vector3(0,0,-1);
-    public Vector3 vUp = new Vector3(0,1,0);
+	public double AspectRatio { get; set; } = 1.0;
+    public int ImageHeight { get; set; } = 100;
+    public int SamplesPerPixel { get; set; } = 10;
+    public int MaxDepth { get; set; } = 10;
+    public double vFOV { get; set; } = 90;
+    public double DefocusAngle { get; set; } = 0;
+    public double FocusDistance { get; set; } = 10;
+    public Vector3 LookFrom { get; set; } = new Vector3(0,0,3);
+    public Vector3 LookAt { get; set; } = new Vector3(0,0,-1);
+    public Vector3 vUp { get; set; } = new Vector3(0,1,0);
 
     double pixelSampleScale;
     int imageWidth;

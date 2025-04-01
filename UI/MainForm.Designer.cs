@@ -35,6 +35,9 @@
 			this.OutputDestination = new Label();
 			this.OpenSceneEditor = new Button();
 			this.ButtonsGroup = new Panel();
+			this.LoadSceneButton = new Button();
+			this.SaveSceneButton = new Button();
+			this.SaveFileDialog = new SaveFileDialog();
 			this.ButtonsGroup.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -63,12 +66,12 @@
 			// 
 			// BeginRender
 			// 
-			this.BeginRender.Font = new Font("Segoe UI Semibold",18F);
-			this.BeginRender.Location = new Point(165,0);
+			this.BeginRender.Font = new Font("Segoe UI Semibold",12F);
+			this.BeginRender.Location = new Point(100,0);
 			this.BeginRender.Name = "BeginRender";
-			this.BeginRender.Size = new Size(159,74);
+			this.BeginRender.Size = new Size(94,61);
 			this.BeginRender.TabIndex = 7;
-			this.BeginRender.Text = "Render";
+			this.BeginRender.Text = "Render the image";
 			this.BeginRender.UseVisualStyleBackColor = true;
 			this.BeginRender.Click += this.BeginRender_Click;
 			// 
@@ -91,10 +94,10 @@
 			// 
 			// OpenSceneEditor
 			// 
-			this.OpenSceneEditor.Font = new Font("Segoe UI Semibold",18F);
+			this.OpenSceneEditor.Font = new Font("Segoe UI Semibold",10F);
 			this.OpenSceneEditor.Location = new Point(0,0);
 			this.OpenSceneEditor.Name = "OpenSceneEditor";
-			this.OpenSceneEditor.Size = new Size(159,74);
+			this.OpenSceneEditor.Size = new Size(94,61);
 			this.OpenSceneEditor.TabIndex = 8;
 			this.OpenSceneEditor.Text = "Open Scene editor";
 			this.OpenSceneEditor.UseVisualStyleBackColor = true;
@@ -102,12 +105,40 @@
 			// 
 			// ButtonsGroup
 			// 
+			this.ButtonsGroup.Controls.Add(this.LoadSceneButton);
+			this.ButtonsGroup.Controls.Add(this.SaveSceneButton);
 			this.ButtonsGroup.Controls.Add(this.BeginRender);
 			this.ButtonsGroup.Controls.Add(this.OpenSceneEditor);
-			this.ButtonsGroup.Location = new Point(30,461);
+			this.ButtonsGroup.Location = new Point(-1,461);
 			this.ButtonsGroup.Name = "ButtonsGroup";
-			this.ButtonsGroup.Size = new Size(324,74);
+			this.ButtonsGroup.Size = new Size(396,74);
 			this.ButtonsGroup.TabIndex = 10;
+			// 
+			// LoadSceneButton
+			// 
+			this.LoadSceneButton.Font = new Font("Segoe UI Semibold",12F);
+			this.LoadSceneButton.Location = new Point(300,0);
+			this.LoadSceneButton.Name = "LoadSceneButton";
+			this.LoadSceneButton.Size = new Size(94,61);
+			this.LoadSceneButton.TabIndex = 10;
+			this.LoadSceneButton.Text = "Load scene";
+			this.LoadSceneButton.UseVisualStyleBackColor = true;
+			// 
+			// SaveSceneButton
+			// 
+			this.SaveSceneButton.Font = new Font("Segoe UI Semibold",12F);
+			this.SaveSceneButton.Location = new Point(200,0);
+			this.SaveSceneButton.Name = "SaveSceneButton";
+			this.SaveSceneButton.Size = new Size(94,61);
+			this.SaveSceneButton.TabIndex = 9;
+			this.SaveSceneButton.Text = "Save scene";
+			this.SaveSceneButton.UseVisualStyleBackColor = true;
+			this.SaveSceneButton.Click += this.SaveSceneButton_Click;
+			// 
+			// SaveFileDialog
+			// 
+			this.SaveFileDialog.DefaultExt = "rtc";
+			this.SaveFileDialog.Filter = "Raytracer scene|*.rtc";
 			// 
 			// MainForm
 			// 
@@ -122,6 +153,7 @@
 			this.MinimumSize = new Size(423,586);
 			this.Name = "MainForm";
 			this.Text = "Ray tracer";
+			this.FormClosing += this.OnClosing;
 			this.Resize += this.onResize;
 			this.ButtonsGroup.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -137,5 +169,8 @@
 		private Label OutputDestination;
 		private Button OpenSceneEditor;
 		private Panel ButtonsGroup;
+		private SaveFileDialog SaveFileDialog;
+		private Button SaveSceneButton;
+		private Button LoadSceneButton;
 	}
 }

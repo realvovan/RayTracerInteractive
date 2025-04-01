@@ -1,5 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace RayTracer;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(Lambertian),"lambertian")]
+[JsonDerivedType(typeof(Metal),"metal")]
+[JsonDerivedType(typeof(Dielectric),"dielectric")]
 abstract class Material {
     public abstract bool Scatter(Ray rIn,HitRecord rec,ref Color attenuation,ref Ray scattered);
     public abstract Material Clone();

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Media;
-using System.Runtime.CompilerServices;
+using System.Text.Json;
 using RayTracer;
 
 namespace RayTracerUI;
@@ -10,8 +10,10 @@ public partial class MainForm : Form {
 	private Dictionary<Control,double?[]> scaleSizes;
 	private Dictionary<Control,double[]> anchorPoints;
 	private System.Drawing.Color outputDestDefaultColor;
+	private JsonSerializerOptions serializeSaveOptions = new() { WriteIndented = true };
 	internal readonly Camera cam = new();
 	internal Dictionary<string,Sphere> scene = [];
+	internal bool shouldPromptSaveOption = false;
 
 	public MainForm() {
 		this.InitializeComponent();
@@ -20,8 +22,6 @@ public partial class MainForm : Form {
 			{this.DescriptionLabel, [0.5,null]},
 			{this.OutputDestination, [0.5,null]},
 			{this.ButtonsGroup, [0.5,null]},
-			{this.BeginRender, [1,null]},
-			{this.OpenSceneEditor, [0,null]}
 		};
 		this.scaleSizes = new Dictionary<Control,double?[]> {
 
@@ -31,25 +31,26 @@ public partial class MainForm : Form {
 			{this.DescriptionLabel, [0.5,0]},
 			{this.OutputDestination, [0.5,0]},
 			{this.ButtonsGroup, [0.5,0]},
-			{this.BeginRender, [1,0]},
 		};
 
-		var properties = typeof(Camera).GetFields();
+		var properties = typeof(Camera).GetProperties();
 		for (int i = 0; i < properties.Length; i++) {
+			string propertyName = properties[i].Name;
+			if (propertyName == "ScanLines" || propertyName == "IsRendering") continue;
 			var panel = new Panel() {
 				Size = new Size(377,26),
-				Location = new Point(12,72 + 30 * i),
-				Name = properties[i].Name + "Panel"
+				Location = new Point(12,72 + 30 * (i - 2)), //subtract 2 bcuz of the 2 ignored properties
+				Name = propertyName + "Panel"
 			};
 			var label = new Label() {
-				Text = properties[i].Name,
-				Name = properties[i].Name + "Label",
+				Text = propertyName,
+				Name = propertyName + "Label",
 				AutoSize = true,
 				Location = new Point(0,0),
 				Font = new Font("Segoe UI",12)
 			};
 			var box = new TextBox() {
-				Name = properties[i].Name,
+				Name = propertyName,
 				Text = properties[i].GetValue(cam)!.ToString(),
 				Size = new Size(226,29),
 				Location = new Point(151,0),
@@ -70,7 +71,7 @@ public partial class MainForm : Form {
 					&& args.KeyChar != '.'
 					&& args.KeyChar != ' ';
 			};
-			box.Tag = properties[i].FieldType.Name;
+			box.Tag = properties[i].PropertyType.Name;
 			scalePositions.Add(panel,[0.5,null]);
 			anchorPoints.Add(panel,[0.5,0]);
 			box.LostFocus += (sender,args) => handleInputs(box);
@@ -82,6 +83,7 @@ public partial class MainForm : Form {
 		onResize(this,new EventArgs());
 
 		this.outputDestDefaultColor = this.OutputDestination.BackColor;
+		this.SaveFileDialog.InitialDirectory = Application.StartupPath;
 	}
 
 	private void handleInputs(Control element) {
@@ -108,7 +110,8 @@ public partial class MainForm : Form {
 			if (tag == "Int32") value = Convert.ToInt32(value);
 			element.Text = value.ToString();
 		}
-		typeof(Camera).GetField(element.Name)?.SetValue(this.cam,value);
+		typeof(Camera).GetProperty(element.Name)?.SetValue(this.cam,value);
+		this.shouldPromptSaveOption = true;
 	}
 
 	private async void BeginRender_Click(object sender,EventArgs e) {
@@ -118,6 +121,17 @@ public partial class MainForm : Form {
 			SystemSounds.Asterisk.Play();
 			onResize(this,new EventArgs());
 			return;
+		}
+		if (this.shouldPromptSaveOption) {
+			var result = MessageBox.Show(
+			"You've made changed to the scene, would you like to save them before rendering the image?",
+			"Caution",
+			MessageBoxButtons.YesNoCancel,
+			MessageBoxIcon.None
+			);
+			if (result == DialogResult.Yes) {
+				this.SaveSceneButton_Click(this.SaveSceneButton,new EventArgs());
+			} else if (result == DialogResult.Cancel) return;
 		}
 		if (this.scene.Count == 0) {
 			DialogResult result = MessageBox.Show(
@@ -144,7 +158,6 @@ public partial class MainForm : Form {
 			string directory = this.OutputPathSelection.SelectedPath;
 			string fullPath = directory + "\\output.jpeg";
 			foreach (KeyValuePair<string,Sphere> i in this.scene) hittables.Add(i.Value);
-			//this.cam.Render(this.OutputPathSelection.SelectedPath + "\\output.jpeg",hittables);
 			using Image? render = this.cam.Render(hittables);
 			if (render == null) return;
 			int counter = 1;
@@ -184,9 +197,8 @@ public partial class MainForm : Form {
 		}
 	}
 	private void OpenSceneEditor_Click(object sender,EventArgs e) {
-		using (SceneEditor sceneEditor = new()) {
-			sceneEditor.ShowDialog();
-		}
+		using var sceneEditor = new SceneEditor();
+		sceneEditor.ShowDialog();
 	}
 
 	private void onResize(object sender,EventArgs e) {
@@ -196,5 +208,41 @@ public partial class MainForm : Form {
 		foreach (KeyValuePair<Control,double?[]> kv in this.scalePositions) {
 			Utils.ScaleControlPosition(kv.Key,kv.Value,this.anchorPoints.GetValueOrDefault(kv.Key,[0,0]));
 		}
+	}
+
+	private void SaveSceneButton_Click(object sender,EventArgs e) {
+		if (this.SaveFileDialog.ShowDialog() != DialogResult.OK) return;
+		this.Enabled = false;
+		string path = this.SaveFileDialog.FileName;
+		this.SaveFileDialog.FileName = ""; // resets the file name cuz otherwise it would be the full path on re-open
+		if (Path.GetExtension(path) != ".rtc") path = Path.ChangeExtension(path,".rtc");
+		using var writer = new StreamWriter(path);
+		writer.WriteLine(JsonSerializer.Serialize(new { Camera = this.cam,Scene = this.scene },this.serializeSaveOptions));
+		MessageBox.Show(
+			$"Scene saved successfully to {Path.GetFileName(path)}!",
+			"Success",
+			MessageBoxButtons.OK,
+			MessageBoxIcon.None
+		);
+		this.shouldPromptSaveOption = false;
+		this.Enabled = true;
+	}
+
+	private void OnClosing(object sender,FormClosingEventArgs e) {
+		if (!this.shouldPromptSaveOption) {
+			e.Cancel = false;
+			return;
+		}
+		var result = MessageBox.Show(
+			"You've made changed to the scene, would you like to save them?",
+			"Caution",
+			MessageBoxButtons.YesNoCancel,
+			MessageBoxIcon.None
+		);
+		if (result == DialogResult.Yes) {
+			this.SaveSceneButton_Click(this.SaveSceneButton,new EventArgs());
+			e.Cancel = false;
+		} else if (result == DialogResult.No) e.Cancel = false;
+		else e.Cancel = true;
 	}
 }

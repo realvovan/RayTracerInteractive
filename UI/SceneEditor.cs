@@ -69,6 +69,7 @@ public partial class SceneEditor : Form {
 		sphere.Center = newPosition;
 		control.Text = newPosition.ToString();
 		this.selectedObject.Text = getObjectLabelText(this.selectedObject.Name,sphere);
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void onFocusLostTagString(object? sender,EventArgs args) {
 		//if its a string type it can only be name so yeah
@@ -84,6 +85,7 @@ public partial class SceneEditor : Form {
 		sceneDict.Add(control.Text,temp);
 		this.selectedObject.Name = control.Text;
 		this.selectedObject.Text = getObjectLabelText(control.Text,sceneDict[control.Text]);
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void onFocusLostTagDouble(object? sender,EventArgs args) {
 		if (sender is not TextBox control || this.selectedObject == null) return;
@@ -99,6 +101,7 @@ public partial class SceneEditor : Form {
 			sphere.Material.GetType().GetProperty(propertyName)?.SetValue(sphere.Material,Convert.ToDouble(control.Text));
 		}
 		this.selectedObject.Text = getObjectLabelText(this.selectedObject.Name,sphere);
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void onMaterialBoxChanged(object? sender,EventArgs args) {
 		if (sender is not ComboBox control || this.selectedObject == null) return;
@@ -128,8 +131,10 @@ public partial class SceneEditor : Form {
 			sphere.Material = new Dielectric(Convert.ToDouble(this.DielectricIndexBox.Text));
 		}
 		this.selectedObject.Text = getObjectLabelText(this.selectedObject.Name,sphere);
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void onFocusLostMaterialBox(object? sender,EventArgs args) {
+		//if the user types in a material and it's not real, it defaults to Lambertian
 		if (sender is not ComboBox control || this.selectedObject == null) return;
 		bool success = Enum.TryParse<Materials>(control.Text,out var result);
 		control.SelectedItem = success ? result : Materials.Lambertian;
@@ -142,6 +147,7 @@ public partial class SceneEditor : Form {
 		RayTracer.Color color = new(control.BackColor.R / 255d,control.BackColor.G / 255d,control.BackColor.B / 255d);
 		if (sphere.Material is Lambertian) ((Lambertian)sphere.Material).Albedo = color;
 		else if (sphere.Material is Metal) ((Metal)sphere.Material).Albedo = color;
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void setUpTextBoxEvent(Control parent) {
 		foreach (Control i in parent.Controls) {
@@ -247,6 +253,7 @@ public partial class SceneEditor : Form {
 		selectedObject.Click += onSceneObjectClick;
 
 		this.SceneObjects.Controls.Add(selectedObject);
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 	private void RemoveObject_Click(object sender,EventArgs e) {
 		if (this.selectedObject == null) return;
@@ -261,6 +268,7 @@ public partial class SceneEditor : Form {
 		this.ObjectNameBox.Text = "";
 		this.RadiusBox.Text = "";
 		this.PositionBox.Text = "";
+		Program.mainForm.shouldPromptSaveOption = true;
 	}
 
 	private async void RenderPreview_Click(object sender,EventArgs e) {
