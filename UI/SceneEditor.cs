@@ -277,7 +277,7 @@ public partial class SceneEditor : Form {
 		Camera renderCam = Program.mainForm.cam;
 		Camera previewCam = new();
 		HittableList previewScene = new();
-		foreach (var property in typeof(Camera).GetFields()) {
+		foreach (var property in typeof(Camera).GetProperties()) {
 			property.SetValue(previewCam,property.GetValue(renderCam));
 		}
 		previewCam.ImageHeight = 240;

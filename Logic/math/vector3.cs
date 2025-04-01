@@ -3,9 +3,18 @@ namespace RayTracer;
 class Vector3 {
     double[] e;
     //getters
-    public double X => this.e[0];
-    public double Y => this.e[1];
-    public double Z => this.e[2];
+    public double X {
+        get => this.e[0];
+        init => this.e[0] = value;
+    }
+    public double Y {
+        get => this.e[1];
+        init => this.e[1] = value;
+    }
+    public double Z {
+        get => this.e[2];
+        init => this.e[2] = value;
+    }
     //constructors
     public Vector3() => this.e = [0d,0d,0d];
     public Vector3(double x, double y, double z) => this.e = [x,y,z];

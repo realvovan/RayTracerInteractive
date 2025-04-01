@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Media;
+using System.Reflection;
 using System.Text.Json;
 using RayTracer;
 
@@ -9,9 +10,10 @@ public partial class MainForm : Form {
 	private Dictionary<Control,double?[]> scalePositions;
 	private Dictionary<Control,double?[]> scaleSizes;
 	private Dictionary<Control,double[]> anchorPoints;
+	private Dictionary<string,TextBox> cameraParamBoxes = [];
 	private System.Drawing.Color outputDestDefaultColor;
 	private JsonSerializerOptions serializeSaveOptions = new() { WriteIndented = true };
-	internal readonly Camera cam = new();
+	internal Camera cam = new();
 	internal Dictionary<string,Sphere> scene = [];
 	internal bool shouldPromptSaveOption = false;
 
@@ -76,6 +78,7 @@ public partial class MainForm : Form {
 			anchorPoints.Add(panel,[0.5,0]);
 			box.LostFocus += (sender,args) => handleInputs(box);
 
+			this.cameraParamBoxes.Add(propertyName,box);
 			panel.Controls.Add(label);
 			panel.Controls.Add(box);
 			this.Controls.Add(panel);
@@ -185,7 +188,6 @@ public partial class MainForm : Form {
 		progressForm.Close();
 		Process.Start("explorer.exe",this.OutputPathSelection.SelectedPath);
 		await renderTask; //wait for the file to get saved
-		this.Close();
 		Application.Exit();
 	}
 
@@ -228,8 +230,60 @@ public partial class MainForm : Form {
 		this.Enabled = true;
 	}
 
+	private void LoadSceneButton_Click(object sender,EventArgs e) {
+		if (this.OpenFileDialog.ShowDialog() != DialogResult.OK) return;
+		string path = this.OpenFileDialog.FileName;
+		this.OpenFileDialog.FileName = "";
+		if (Path.GetExtension(path) != ".rtc") {
+			MessageBox.Show(
+				"Unsupported file type! Please select an \".rtc\" file",
+				"Oops...",
+				MessageBoxButtons.OK,
+				MessageBoxIcon.Error
+			);
+			return;
+		}
+		//deserialize objects and load them
+		this.Enabled = false;
+		try {
+			using var reader = new StreamReader(path);
+			var dict = JsonSerializer.Deserialize<Dictionary<string,JsonElement>>(reader.ReadToEnd());
+			var errorMessage = $"Could not load the scene from file {Path.GetFileName(path)}";
+			if (dict == null) throw new Exception(errorMessage);
+			else {
+				this.scene.Clear();
+				this.cam = dict["Camera"].Deserialize<Camera>() ?? throw new Exception(errorMessage);
+				this.scene = dict["Scene"].Deserialize<Dictionary<string,Sphere>>() ?? throw new Exception(errorMessage);
+				foreach (PropertyInfo i in typeof(Camera).GetProperties()) {
+					if (i.Name == "ScanLines" || i.Name == "IsRendering") continue;
+					this.cameraParamBoxes[i.Name].Text = i.GetValue(this.cam)!.ToString();
+				}
+				dict.Clear();
+			}
+		} catch (Exception exception) {
+			Console.WriteLine($"Source: {exception.Source}");
+			Console.WriteLine($"Stack trace: {exception.StackTrace}");
+			MessageBox.Show(
+				exception.Message,
+				"Oops...",
+				MessageBoxButtons.OK,
+				MessageBoxIcon.Error
+			);
+			this.Enabled = true;
+			return;
+		}
+		MessageBox.Show(
+			"Scene loaded successfully!",
+			"Yippie",
+			MessageBoxButtons.OK,
+			MessageBoxIcon.None
+		);
+		this.shouldPromptSaveOption = false;
+		this.Enabled = true;
+	}
+
 	private void OnClosing(object sender,FormClosingEventArgs e) {
-		if (!this.shouldPromptSaveOption) {
+		if (!this.shouldPromptSaveOption || e.CloseReason != CloseReason.UserClosing) {
 			e.Cancel = false;
 			return;
 		}

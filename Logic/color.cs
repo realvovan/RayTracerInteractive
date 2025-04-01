@@ -3,9 +3,18 @@ namespace RayTracer;
 class Color {
     static readonly Interval intensity = new Interval(0.000,0.999);
     double[] colors;
-    public double R => this.colors[0];
-    public double G => this.colors[1];
-    public double B => this.colors[2];
+        public double R {
+        get => this.colors[0];
+        init => this.colors[0] = value;
+    }
+    public double G {
+        get => this.colors[1];
+        init => this.colors[1] = value;
+    }
+    public double B {
+        get => this.colors[2];
+        init => this.colors[2] = value;
+    }
 
     public Color() => this.colors = [0,0,0];
     public Color(double r, double g, double b) => this.colors = [r,g,b];

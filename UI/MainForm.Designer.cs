@@ -38,6 +38,7 @@
 			this.LoadSceneButton = new Button();
 			this.SaveSceneButton = new Button();
 			this.SaveFileDialog = new SaveFileDialog();
+			this.OpenFileDialog = new OpenFileDialog();
 			this.ButtonsGroup.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -123,6 +124,7 @@
 			this.LoadSceneButton.TabIndex = 10;
 			this.LoadSceneButton.Text = "Load scene";
 			this.LoadSceneButton.UseVisualStyleBackColor = true;
+			this.LoadSceneButton.Click += this.LoadSceneButton_Click;
 			// 
 			// SaveSceneButton
 			// 
@@ -139,6 +141,12 @@
 			// 
 			this.SaveFileDialog.DefaultExt = "rtc";
 			this.SaveFileDialog.Filter = "Raytracer scene|*.rtc";
+			//
+			// OpenFileDialog
+			//
+			this.OpenFileDialog.DefaultExt = "rtc";
+			this.SaveFileDialog.Filter = "Raytracer scene|*.rtc";
+			this.OpenFileDialog.OkRequiresInteraction = true;
 			// 
 			// MainForm
 			// 
@@ -170,6 +178,7 @@
 		private Button OpenSceneEditor;
 		private Panel ButtonsGroup;
 		private SaveFileDialog SaveFileDialog;
+		private OpenFileDialog OpenFileDialog;
 		private Button SaveSceneButton;
 		private Button LoadSceneButton;
 	}
