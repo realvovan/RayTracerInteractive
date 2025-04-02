@@ -6,12 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>output.ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="output.ico" />
+    <Content Include="icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

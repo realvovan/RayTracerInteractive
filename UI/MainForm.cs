@@ -62,7 +62,7 @@ public partial class MainForm : Form {
 			};
 			box.KeyPress += (sender,args) => {
 				if (args.KeyChar == (char)Keys.Enter) {
-					handleInputs(box);
+					handleInputs(sender,EventArgs.Empty);
 					args.Handled = true;
 				}
 				args.Handled =
@@ -76,20 +76,21 @@ public partial class MainForm : Form {
 			box.Tag = properties[i].PropertyType.Name;
 			scalePositions.Add(panel,[0.5,null]);
 			anchorPoints.Add(panel,[0.5,0]);
-			box.LostFocus += (sender,args) => handleInputs(box);
+			box.LostFocus += handleInputs;
 
 			this.cameraParamBoxes.Add(propertyName,box);
 			panel.Controls.Add(label);
 			panel.Controls.Add(box);
 			this.Controls.Add(panel);
 		}
-		onResize(this,new EventArgs());
+		onResize(this,EventArgs.Empty);
 
 		this.outputDestDefaultColor = this.OutputDestination.BackColor;
 		this.SaveFileDialog.InitialDirectory = Application.StartupPath;
 	}
 
-	private void handleInputs(Control element) {
+	private void handleInputs(object? sender,EventArgs args) {
+		if (sender is not Control element) return;
 		if (element.Tag is not string tag) return;
 		object value;
 		if (tag == "Vector3") {
@@ -122,7 +123,7 @@ public partial class MainForm : Form {
 			this.OutputDestination.Text = "Please selected an output destination!";
 			this.OutputDestination.BackColor = System.Drawing.Color.Red;
 			SystemSounds.Asterisk.Play();
-			onResize(this,new EventArgs());
+			onResize(this,EventArgs.Empty);
 			return;
 		}
 		if (this.shouldPromptSaveOption) {
@@ -133,7 +134,7 @@ public partial class MainForm : Form {
 			MessageBoxIcon.None
 			);
 			if (result == DialogResult.Yes) {
-				this.SaveSceneButton_Click(this.SaveSceneButton,new EventArgs());
+				this.SaveSceneButton_Click(this.SaveSceneButton,EventArgs.Empty);
 			} else if (result == DialogResult.Cancel) return;
 		}
 		if (this.scene.Count == 0) {
@@ -195,7 +196,7 @@ public partial class MainForm : Form {
 		if (this.OutputPathSelection.ShowDialog() == DialogResult.OK) {
 			this.OutputDestination.Text = "Output path: " + this.OutputPathSelection.SelectedPath + "\\output.jpeg";
 			this.OutputDestination.BackColor = this.outputDestDefaultColor;
-			onResize(this,new EventArgs());
+			onResize(this,EventArgs.Empty);
 		}
 	}
 	private void OpenSceneEditor_Click(object sender,EventArgs e) {
@@ -294,7 +295,7 @@ public partial class MainForm : Form {
 			MessageBoxIcon.None
 		);
 		if (result == DialogResult.Yes) {
-			this.SaveSceneButton_Click(this.SaveSceneButton,new EventArgs());
+			this.SaveSceneButton_Click(this.SaveSceneButton,EventArgs.Empty);
 			e.Cancel = false;
 		} else if (result == DialogResult.No) e.Cancel = false;
 		else e.Cancel = true;

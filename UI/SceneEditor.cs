@@ -34,7 +34,7 @@ public partial class SceneEditor : Form {
 	}
 	private void onKeyPressTagDouble(object? sender,KeyPressEventArgs args) {
 		if (args.KeyChar == (char)Keys.Enter) {
-			onFocusLostTagDouble(sender,new EventArgs());
+			onFocusLostTagDouble(sender,EventArgs.Empty);
 			args.Handled = true;
 		}
 		args.Handled =
@@ -45,7 +45,7 @@ public partial class SceneEditor : Form {
 	}
 	private void onKeyPressTagVector(object? sender,KeyPressEventArgs args) {
 		if (args.KeyChar == (char)Keys.Enter) {
-			onFocusLostTagVector(sender,new EventArgs());
+			onFocusLostTagVector(sender,EventArgs.Empty);
 			args.Handled = true;
 		}
 		args.Handled =
@@ -57,7 +57,7 @@ public partial class SceneEditor : Form {
 	}
 	private void onKeyPressTagString(object? sender,KeyPressEventArgs args) {
 		if (args.KeyChar == (char)Keys.Enter) {
-			onFocusLostTagString(sender,new EventArgs());
+			onFocusLostTagString(sender,EventArgs.Empty);
 			args.Handled = true;
 		}
 	}
