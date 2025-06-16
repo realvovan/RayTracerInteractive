@@ -1,6 +1,6 @@
 # **Interactive ray tracer**
 A Winforms program for interacting with a ray tracer for rendering spheres with different materials and colors, everything written in C#
-### Current features incldue:
+### Current features include:
 * modifiable camera parameters
 * adding/removing objects from the scenes
 * changing object size, position, material, color
